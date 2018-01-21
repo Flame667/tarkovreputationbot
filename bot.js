@@ -34,48 +34,48 @@ function timeMin() {
 }
 
 function setData(arg, key, value, message) {
-  if(!fs.existsSync(message.guild.id+".reputation.json")) {
+  if(!fs.existsSync("reputation.json")) {
     let obj = {}
     obj[arg] = CreatePerson(arg)
     obj[arg][key] = value
-    fs.writeFileSync(message.guild.id+".reputation.json", JSON.stringify(obj))
+    fs.writeFileSync("reputation.json", JSON.stringify(obj))
     return
   } else {
-    let obj = JSON.parse(fs.readFileSync(message.guild.id+".reputation.json"))
+    let obj = JSON.parse(fs.readFileSync("reputation.json"))
     if(!obj.hasOwnProperty(arg)) {
       obj[arg] = CreatePerson(arg)
       obj[arg][key] = value
-      fs.writeFileSync(message.guild.id+".reputation.json", JSON.stringify(obj))
+      fs.writeFileSync("reputation.json", JSON.stringify(obj))
       return
     } else {
       // Weird bug/glitch runs this twice
       obj[arg][key] = value
-      fs.writeFileSync(message.guild.id+".reputation.json", JSON.stringify(obj))
+      fs.writeFileSync("reputation.json", JSON.stringify(obj))
       return
     }
   }
 }
 
 function getData(arg, message) {
-  if(!fs.existsSync(message.guild.id+".reputation.json")) {
+  if(!fs.existsSync("reputation.json")) {
     let obj = {}
     obj[arg] = CreatePerson(arg)
-    fs.writeFileSync(message.guild.id+".reputation.json", JSON.stringify(obj))
+    fs.writeFileSync("reputation.json", JSON.stringify(obj))
     return obj[arg]
   } else {
-    let obj = JSON.parse(fs.readFileSync(message.guild.id+".reputation.json"))
+    let obj = JSON.parse(fs.readFileSync("reputation.json"))
     if(obj.hasOwnProperty(arg)) {
       return obj[arg]
     } else {
       obj[arg] = CreatePerson(arg)
-      fs.writeFileSync(message.guild.id+".reputation.json", JSON.stringify(obj))
+      fs.writeFileSync("reputation.json", JSON.stringify(obj))
       return obj[arg]
     }
   }
 }
 
 function isStaff(message) {
-  if (message.member.roles.find("name", "Admin") || message.member.roles.find("name", "Mod") || message.member.roles.find("name", "Owner") || message.member.roles.find("name", "The Military") || message.member.roles.find("name", "Bandits")) {
+  if (message.member.roles.find("name", "Staff")) {
     return true;
   }
   else {
@@ -98,17 +98,13 @@ function CreatePerson(personID){
 }
 
 client.on("message", async message => {
+  if (transferring == true) {
+    return
+  }
+
   if(message.author.bot) return;
 
   if(message.content.indexOf(config.prefix) !== 0) return;
-
-  if(transferring == true) {
-    message.delete()
-      .then(msg => console.log(`Updated the content of a message from ${msg.author}`))
-    .catch(console.error);
-    message.reply("***Bot Commands Are Currently Disabled!***")
-    return
-  }
 
   const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
   const command = args.shift().toLowerCase();
@@ -130,13 +126,13 @@ client.on("message", async message => {
     let nrep = getData(arg, message).NegativeRep
     let embed = {
       "description": `${user} \ \ Positive Rep: **${rep}** \ **|** \ Negative Rep: **${nrep}**`,
-      "color": 00000,
+      "color": 4886754,
     }
     return message.channel.send({ embed });
   } // END OF PROFILE COMMAND
 
   if (command === "rep" || command === "-rep" || command === "+rep") {
-    let obj = JSON.parse(fs.readFileSync(message.guild.id+".reputation.json"))
+    let obj = JSON.parse(fs.readFileSync("reputation.json"))
     let timeLeft = null
     if (!obj.hasOwnProperty(message.author.id)) {
       getData(message.author.id, message)
@@ -196,13 +192,13 @@ client.on("message", async message => {
       nrep += 1;
       setData(arg, "NegativeRep", nrep, message)
       message.channel.send('**🔻 | \ ' + message.author.username + ' has added a negative rep point to <@'+ arg + '>**');
-      client.channels.find('name','rep-bot-log').send('** 🔻 | \ ' + message.author + ' has added a negative rep point to <@'+ arg + '>**');
+      message.guild.channels.find('name','rep-bot-log').send('** 🔻 | \ ' + message.author + ' has added a negative rep point to <@'+ arg + '>**');
     }
     else {
       rep += 1;
       setData(arg, "PositiveRep", rep, message)
       message.channel.send('**:up:  |  ' + message.author.username + ' has given <@'+ arg +'> a reputation point!**');
-      client.channels.find('name','rep-bot-log').send('** ' + message.author + ' has given <@'+ arg +'> a reputation point!**');
+      message.guild.channels.find('name','rep-bot-log').send('** ' + message.author + ' has given <@'+ arg +'> a reputation point!**');
     }
     setData(message.author.id, "LastRep", timeMin(), message)
     return;
@@ -268,7 +264,7 @@ client.on("message", async message => {
   }
 
   if (command === "addshop") {
-    if (message.member.roles.find("name", "Trusted_Trader") && !message.member.roles.find("name", "no_shop")) {
+    if (message.member.roles.find("name", "trusted") && !message.member.roles.find("name", "no_shop")) {
       let arg = args.slice(0).join(' ')
       console.log("Set "+ message.author.username + "'s shop to: " + arg)
       if (arg == "") {
@@ -290,7 +286,7 @@ client.on("message", async message => {
 
   // LEADERBOARD COMMANDS
   if (command === "leaderboard") {
-    let obj = JSON.parse(fs.readFileSync(message.guild.id+".reputation.json"))
+    let obj = JSON.parse(fs.readFileSync("reputation.json"))
     console.log("Directory Length: " +Object.keys(obj).length)
     var firstID = 0
     var secondID = 0
@@ -510,6 +506,89 @@ client.on("message", async message => {
     return message.author.send({ embed })
   }
 
+  if (command === "timedroles") {
+    if (message.author.id == "237391552698122242" || isStaff(message)) {
+      transferring = true;
+      message.channel.send('Bot Commands Temporarily Disabled')
+      let hobo = message.guild.roles.find("name", "Hobo");
+      let newbie = message.guild.roles.find("name", "Newbie");
+      let scav = message.guild.roles.find("name", "Scav");
+      let privat = message.guild.roles.find("name", "Private");
+      let captain = message.guild.roles.find("name", "Captain");
+      let veteran = message.guild.roles.find("name", "VETERAN");
+      if (hobo == undefined || newbie == undefined || scav == undefined || privat == undefined || captain == undefined || veteran == undefined ) {
+        transferring = false;
+        return message.reply("This discord server doesn't have the corrent roles to use this command")
+      }
+      message.guild.members.forEach(function(guildMember, guildMemberId) {
+        let timeDay = timeMin() -  Math.floor(guildMember.joinedTimestamp / 60000)
+        timeDay = Math.round(timeDay / 1440)
+        console.log(guildMember.joinedAt)
+        console.log(guildMember.user.username + " " + timeDay)
+        if (timeDay < 7) {
+          guildMember.addRole(hobo)
+        }
+        else if (timeDay >= 7 && timeDay < 30) {
+          guildMember.addRole(newbie)
+        }
+        else if (timeDay >= 30 && timeDay < 60) {
+          guildMember.addRole(scav)
+        }
+        else if (timeDay >= 60 && timeDay < 120) {
+          guildMember.addRole(privat)
+        }
+        else if (timeDay >= 120 && timeDay < 180) {
+          guildMember.addRole(captain)
+        }
+        else if (timeDay >= 180) {
+          guildMember.addRole(veteran)
+        }
+      })
+      transferring = false;
+      return message.channel.send('Bot Commands Re-Enabled')
+    }
+  }
+
+  if (command === 'tarvu') {
+    return message.channel.send(':octopus:')
+  }
+
+  if (command === 'jointime') {
+    let arg = ''
+    if (args.slice(0).join(' ') == "") {
+      arg = message.author
+    }
+    if (args.slice(0).join(' ') != "") {
+      if (arg = message.mentions.users.first() == undefined) {
+        return message.reply("Please provide the name of an actual user")
+      }
+      arg = message.mentions.users.first()
+    }
+    message.guild.members.forEach(function(guildMember, guildMemberId) {
+      if (guildMember.user.id == arg.id) {
+        let embed = {
+          "color": 3447003,
+          "fields": [
+            {
+              "name": `${arg.username} joined this discord on:`,
+              "value": "*" + guildMember.joinedAt + "*"
+            },
+            {
+              "name": `${arg.username}'s account was created on:`,
+              "value": "*" + arg.createdAt + "*"
+            }
+          ]
+        }
+        message.author.send({ embed })
+        return message.delete()
+          .then(msg => console.log(`Updated the content of a message from ${msg.author}`))
+        .catch(console.error);
+      }
+      return
+    })
+  }
+
+
   if (command === "enter") {
     if (raffleentries.includes(message.author.id)) {
       return message.reply("You have already entered into the raffle!")
@@ -593,51 +672,6 @@ client.on("message", async message => {
     }
   }
 
-  if (command === "userinfo") {
-    if (isStaff(message)) {
-      if (arg = message.mentions.users.first() == undefined) {
-        return message.reply("Please provide the name of an actual user")
-      }
-      let user = message.mentions.users.first()
-      let embed = {
-        "color": 3447003,
-        "fields": [
-          {
-            "name": "ID",
-            "value": ":" + user.id
-          },
-          {
-            "name": "Username",
-            "value": ":" + user.username
-          },
-          {
-            "name": "Discriminator",
-            "value": ":" + user.discriminator
-          },
-          {
-            "name": "Avatar",
-            "value": ":" + user.avatar
-          },
-          {
-            "name": "Verified",
-            "value": ":" + user.verfified
-          },
-          {
-            "name": "Email",
-            "value": ":" + user.email
-          }
-        ]
-      }
-      message.author.send({ embed })
-      message.delete()
-        .then(msg => console.log(`Updated the content of a message from ${msg.author}`))
-      .catch(console.error);
-      return
-    } else {
-      return message.reply("You don't have the correct role to use that command")
-    }
-  }
-
   if (command === "help") {
     let embed = {
       "description": `***Use the prefix ${config.prefix} for all commands*** \n **Reputation Commands**`,
@@ -696,6 +730,10 @@ client.on("message", async message => {
           "value": "Pings the bot and returns latency"
         },
         {
+          "name": "tarvu",
+          "value": ":octopus:"
+        },
+        {
           "name": "Raffle Commands",
           "value": "-----------------------"
         },
@@ -723,7 +761,10 @@ client.on("message", async message => {
           "name": "stopraffle",
           "value": "Stops current raffle"
         },
-
+        {
+          "name": "timedroles",
+          "value": "Gives out Timed Roles"
+        }
       ]
     }
     return message.author.send({ embed })

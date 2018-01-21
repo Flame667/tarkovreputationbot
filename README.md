@@ -6,22 +6,22 @@ A Basic Bot for Tarkov Discords that has many features but not limited to being 
 # Installation
 Project requires node and npm <br />
 [Node Download Page](https://nodejs.org/en/download/)  Direct: [WINDOWS](https://nodejs.org/dist/v8.9.4/node-v8.9.4-x64.msi) [MAC](https://nodejs.org/dist/v8.9.4/node-v8.9.4.pkg) <br/>
-```node -v``` Checks Node Version, ```npm -v``` Checks npm version <br/>
-```npm install npm@latest -g``` Update Npm (If you just installed node this isn't necessary) <br/> <br/>
+ *node -v* Checks Node Version, *npm -v* Checks npm version <br/>
+ *npm install npm@latest -g* Update Npm (If you just installed node this isn't necessary) <br/> <br/>
 Step 1: Clone or Download Bot, unzip if you download it
 Step 2: Update config.json for your token and prefix <br />
 Step 3: cd into file directory <br />
-Step 4: ```npm install``` <br />
-Step 5: ```node bot``` <br />
+Step 4: ```npm install discord.js``` <br />
+Step 5: ```npm install fs``` <br />
+Step 6: ```node bot``` <br />
+If you get an error related to a file not existing, create a file reputation.json containing just '{}'
 
 # Required Roles
 
 1. __Needed to use staff commands__
-  - Owner
-  - Admin
-  - Mod
-1. __Needed to use shop commands__
-  - trusted_trader
+  - Staff
+2. __Needed to use shop commands__
+  - trusted
 3. __Recommended but Not Needed for other commands__
   - BEAR
   - USEC
@@ -39,7 +39,7 @@ Command | Definition | Usage
 (+/-)rep [username] | Give someone positive or negative reputation | +rep @cranberriez **Gives 1 positive rep**<br /> rep @cranberriez **Gives 1 positive rep**<br /> -rep @cranberriez **Gives 1 negative rep**
 profile [username] (optional) | Shows the profile or positve and negative reputation of someone or yourself | profile **Shows your profile**<br /> profile @cranberriez **Shows cranberriez profile**
 addshop [url] | Adds a shop url for yourself, only works for users with the **trusted_trader** role | addshop i.imgur.com **Adds any url as your shop**
-shop [username] | Shows a trusted_trader's shop | shop @cranberriez **Returns the url the trusted_trader set as their shop**
+shop [username] | Shows a trusted's shop | shop @cranberriez **Returns the url the trusted_trader set as their shop**
 leaderboard | Shows top 3 users and their reputation <br /> Ignored users has to be hardcoded| leaderboard **Returns leaderboard**
 
 
@@ -54,6 +54,7 @@ bear | Gives you the BEAR role
 usec | Gives you the USEC role
 notify | Gives you the notify role <br /> we use this to mention users that want news or info instead of doing @everyone
 ping | pings the bot and shows latency
+tarvu | Praise tarvu
 
 
 **Raffle Commands**
@@ -71,3 +72,4 @@ Command | Definition | Usage
 ------- | ------- | --------
 setrep | Gives or Removes, depending on +/-, another players' positive/negative reputation | setrep + @cranberriez 13 **Sets postive rep to 13**<br /> setrep - @cranberriez 12 **Sets negative rep to 12**
 stopraffle | Stops current raffle
+timedroles | Gives out roles based on time in the server | *Only Used On ShoSho's*
