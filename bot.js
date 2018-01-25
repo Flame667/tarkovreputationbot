@@ -83,6 +83,15 @@ function isStaff(message) {
   }
 }
 
+function isTrusted(message) {
+  if (message.member.roles.find("name", "trusted") || message.member.roles.find("name", "Traders") || message.member.roles.find("name", "LVL 1 Trader") || message.member.roles.find("name", "LVL 2 Trader") || message.member.roles.find("name", "LVL 3 Trader") || message.member.roles.find("name", "♛ Loyalty Trader ♛") ) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
 function Person(personID) {
   this.PersonID = personID;
   this.PositiveRep = 0;
@@ -101,6 +110,17 @@ client.on("message", async message => {
   if (transferring == true) {
     return
   }
+
+  //if (message.channel.id == '403190416914251777') {
+  if (!isStaff(message)) {
+    if ((message.content).includes('discord.gg') || (message.content).includes('discordapp.com/invite')) {
+      message.author.send("Please do not post invite links to other discords! Thankyou")
+      message.delete()
+        .then(msg => console.log(`Deleted discord invite link from ${message.author.username}`))
+        .catch(console.error);
+    }
+  }
+  //}
 
   if(message.author.bot) return;
 
@@ -264,7 +284,7 @@ client.on("message", async message => {
   }
 
   if (command === "addshop") {
-    if (message.member.roles.find("name", "trusted") && !message.member.roles.find("name", "no_shop")) {
+    if (isTrusted(message)) { // && !message.member.roles.find("name", "no_shop")
       let arg = args.slice(0).join(' ')
       console.log("Set "+ message.author.username + "'s shop to: " + arg)
       if (arg == "") {
