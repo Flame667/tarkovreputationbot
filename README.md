@@ -1,4 +1,4 @@
-***THIS PROJECT IS SEVERLY OUTDATED***
+***THIS PROJECT IS SEVERLY OUTDATED*** <br />
 I will be updating soon and also showing a tutorial on how to set this up in an aws ec2 environment. I have not setup mongo support yet.
 
 # ***Tarkov Reputation Bot***
