@@ -1,3 +1,6 @@
+***THIS PROJECT IS SEVERLY OUTDATED***
+I will be updating soon and also showing a tutorial on how to set this up in an aws ec2 environment. I have not setup mongo support yet.
+
 # ***Tarkov Reputation Bot***
 A Basic Bot for Tarkov Discords that has many features but not limited to being able to give and receive reputation. Run with discord.js on node.
 
