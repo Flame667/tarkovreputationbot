@@ -1,4 +1,3 @@
-"use strict"
 const Discord = require("discord.js")
 const client = new Discord.Client({
   disableEveryone: true,
@@ -193,10 +192,11 @@ function CreatePerson(personID){
 
 client.on("guildMemberAdd", member => {
   let role1 = member.guild.roles.find("name", "notify");
-  let role2 = member.guild.roles.find("name", "Hobo");
+  // let role2 = member.guild.roles.find("name", "Hobo");
   member.addRole(role1).catch(console.error);
-  member.addRole(role2).catch(console.error);
-  console.log("Someone Joined and was given notify and Hobo!")
+  // member.addRole(role2).catch(console.error);
+  console.log("Someone Joined and was given notify!")
+  // console.log("Someone Joined and was given notify and Hobo!")
 });
 
 client.on("message", async message => {
@@ -205,7 +205,6 @@ client.on("message", async message => {
   }
 
   //if (message.channel.id == '403190416914251777') {
-
   if ((message.content).includes("discord.gg") || (message.content).includes("discordapp.com/invite")) {
     if (!isStaff(message)) {
       message.author.send("Please do not post invite links to other discords! Thankyou")
@@ -305,8 +304,8 @@ client.on("message", async message => {
     if (command.charAt(0) == '-') {
       nrep += 1;
       setData(arg, "NegativeRep", nrep, message)
-      message.channel.send('**ðŸ”» | \ ' + message.author.username + ' has added a negative rep point to <@'+ arg + '>**');
-      message.guild.channels.find('name','admin-logs').send('** ðŸ”» | \ ' + message.author + ' has added a negative rep point to <@'+ arg + '>**');
+      message.channel.send('**🔻 | \ ' + message.author.username + ' has added a negative rep point to <@'+ arg + '>**');
+      message.guild.channels.find('name','admin-logs').send('** 🔻 | \ ' + message.author + ' has added a negative rep point to <@'+ arg + '>**');
     }
     else {
       rep += 1;
