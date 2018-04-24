@@ -1,3 +1,4 @@
+"use strict"
 const Discord = require("discord.js")
 const client = new Discord.Client({
   disableEveryone: true,
@@ -7,14 +8,15 @@ const client = new Discord.Client({
 })
 const config = require("./config.json")
 // const reputation = require("./reputation.json")
-const fs = require('fs')
+const fs = require("fs")
 
 var transferring = false;
-var raffle = false
-var rafflenum = 0
-var raffleentries = []
+var raffle = false;
+var rafflenum = 0;
+var continueTimed = true;
+var raffleentries = [];
 
-client.on('ready', () => {
+client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`)
   client.user.setGame(`on ${client.guilds.size} servers`)
 });
@@ -28,6 +30,87 @@ client.on("guildDelete", guild => {
   console.log(`I have been removed from: ${guild.name} (id: ${guild.id})`);
   client.user.setGame(`on ${client.guilds.size} servers`);
 });
+
+function timedRoles(message) {
+  var time = 0;
+  var hobo = message.guild.roles.find("name", "Hobo");
+  var newbie = message.guild.roles.find("name", "Newbie");
+  var scav = message.guild.roles.find("name", "Scav");
+  var privat = message.guild.roles.find("name", "Private");
+  var captain = message.guild.roles.find("name", "Captain");
+  let veteran = message.guild.roles.find("name", "VETERAN");
+  if (continueTimed ) {
+    message.channel.send("Timedroles Started, please wait around 5 minutes to insure completion")
+    message.guild.members.forEach(function(guildMember, guildMemberId) {
+      setTimeout(function(){
+        let timeDay = timeMin() -  Math.floor(guildMember.joinedTimestamp / 60000)
+        timeDay = Math.round(timeDay / 1440)
+        console.log(guildMember.joinedAt)
+        if (timeDay < 7) {
+          if (guildMember.roles.has(hobo.id)) {
+            return
+          } else {
+            guildMember.addRole(hobo.id).catch(console.error);
+          }
+        }
+        else if (timeDay >= 7 && timeDay < 30) {
+          if (guildMember.roles.has(newbie.id)) {
+            return
+          } else {
+            guildMember.addRole(newbie.id).catch(console.error);
+            guildMember.removeRole(hobo.id).catch(console.error);
+          }
+        }
+        else if (timeDay >= 30 && timeDay < 60) {
+          if (guildMember.roles.has(scav.id)) {
+            return
+          } else {
+            guildMember.addRole(scav.id).catch(console.error);
+            guildMember.removeRole(hobo.id).catch(console.error);
+            guildMember.removeRole(newbie.id).catch(console.error);
+          }
+        }
+        else if (timeDay >= 60 && timeDay < 120) {
+          if (guildMember.roles.has(privat.id)) {
+            return
+          } else {
+            guildMember.addRole(privat.id).catch(console.error);
+            guildMember.removeRole(hobo.id).catch(console.error);
+            guildMember.removeRole(newbie.id).catch(console.error);
+            guildMember.removeRole(scav.id).catch(console.error);
+          }
+        }
+        else if (timeDay >= 120 && timeDay < 180) {
+          if (guildMember.roles.has(captain.id)) {
+            return
+          } else {
+            guildMember.addRole(captain.id).catch(console.error);
+            guildMember.removeRole(hobo.id).catch(console.error);
+            guildMember.removeRole(newbie.id).catch(console.error);
+            guildMember.removeRole(scav.id).catch(console.error);
+            guildMember.removeRole(privat.id).catch(console.error);
+          }
+        }
+        else if (timeDay >= 180) {
+          if (guildMember.roles.has(veteran.id)) {
+            return
+          } else {
+            guildMember.addRole(veteran.id).catch(console.error);
+            guildMember.removeRole(hobo.id).catch(console.error);
+            guildMember.removeRole(newbie.id).catch(console.error);
+            guildMember.removeRole(scav.id).catch(console.error);
+            guildMember.removeRole(privat.id).catch(console.error);
+            guildMember.removeRole(captain.id).catch(console.error);
+          }
+        }
+      }, time)
+      time += 500;
+    })
+  }
+  else {
+    return
+  }
+}
 
 function timeMin() {
   return Math.floor(Date.now()/60000)
@@ -75,7 +158,8 @@ function getData(arg, message) {
 }
 
 function isStaff(message) {
-  if (message.member.roles.find("name", "Staff")) {
+  let role = message.guild.roles.find("name","Staff")
+  if (message.member.roles.has(role.id)) {
     return true;
   }
   else {
@@ -84,7 +168,8 @@ function isStaff(message) {
 }
 
 function isTrusted(message) {
-  if (message.member.roles.find("name", "trusted") || message.member.roles.find("name", "Traders") || message.member.roles.find("name", "LVL 1 Trader") || message.member.roles.find("name", "LVL 2 Trader") || message.member.roles.find("name", "LVL 3 Trader") || message.member.roles.find("name", "♛ Loyalty Trader ♛") ) {
+  let role = message.guild.roles.find("name","Traders")
+  if (message.member.roles.has(role.id)) {
     return true;
   }
   else {
@@ -106,14 +191,23 @@ function CreatePerson(personID){
    return newUser;
 }
 
+client.on("guildMemberAdd", member => {
+  let role1 = member.guild.roles.find("name", "notify");
+  let role2 = member.guild.roles.find("name", "Hobo");
+  member.addRole(role1).catch(console.error);
+  member.addRole(role2).catch(console.error);
+  console.log("Someone Joined and was given notify and Hobo!")
+});
+
 client.on("message", async message => {
   if (transferring == true) {
     return
   }
 
   //if (message.channel.id == '403190416914251777') {
-  if (!isStaff(message)) {
-    if ((message.content).includes('discord.gg') || (message.content).includes('discordapp.com/invite')) {
+
+  if ((message.content).includes("discord.gg") || (message.content).includes("discordapp.com/invite")) {
+    if (!isStaff(message)) {
       message.author.send("Please do not post invite links to other discords! Thankyou")
       message.delete()
         .then(msg => console.log(`Deleted discord invite link from ${message.author.username}`))
@@ -130,11 +224,11 @@ client.on("message", async message => {
   const command = args.shift().toLowerCase();
 
   if (command === "profile") {
-    let arg = ''
-    if (args.slice(0).join(' ') == "") {
+    let arg = ""
+    if (args.slice(0).join(" ") == "") {
       arg = message.author.id
     }
-    if (args.slice(0).join(' ') != "") {
+    if (args.slice(0).join(" ") != "") {
       if (arg = message.mentions.users.first() == undefined) {
         return message.reply("Please provide the name of an actual user")
       }
@@ -163,7 +257,7 @@ client.on("message", async message => {
     }
     console.log("Time Left: " + timeLeft + " mins of " + message.author.username)
 
-    var values = message.content.split(' ').filter(function(v){return v!==''});
+    var values = message.content.split(" ").filter(function(v){return v!==''});
 
     if (values.length > 2) {
       return message.reply("You Added An Extra Word")
@@ -211,14 +305,14 @@ client.on("message", async message => {
     if (command.charAt(0) == '-') {
       nrep += 1;
       setData(arg, "NegativeRep", nrep, message)
-      message.channel.send('**🔻 | \ ' + message.author.username + ' has added a negative rep point to <@'+ arg + '>**');
-      message.guild.channels.find('name','rep-bot-log').send('** 🔻 | \ ' + message.author + ' has added a negative rep point to <@'+ arg + '>**');
+      message.channel.send('**ðŸ”» | \ ' + message.author.username + ' has added a negative rep point to <@'+ arg + '>**');
+      message.guild.channels.find('name','admin-logs').send('** ðŸ”» | \ ' + message.author + ' has added a negative rep point to <@'+ arg + '>**');
     }
     else {
       rep += 1;
       setData(arg, "PositiveRep", rep, message)
       message.channel.send('**:up:  |  ' + message.author.username + ' has given <@'+ arg +'> a reputation point!**');
-      message.guild.channels.find('name','rep-bot-log').send('** ' + message.author + ' has given <@'+ arg +'> a reputation point!**');
+      message.guild.channels.find('name','admin-logs').send('** ' + message.author + ' has given <@'+ arg +'> a reputation point!**');
     }
     setData(message.author.id, "LastRep", timeMin(), message)
     return;
@@ -246,13 +340,13 @@ client.on("message", async message => {
       arg = message.mentions.users.first().id
       if (director == "-") {
         setData(arg, "NegativeRep", num, message)
-        client.channels.find('name','rep-bot-log').send("** " + message.author + " has set <@"+ arg + ">'s  negative rep to" + num + "**");
         message.reply("set <@" + arg + ">'s negative rep to " + num)
+        client.channels.find('name','admin-logs').send("** " + message.author + " has set <@"+ arg + ">'s  negative rep to" + num + "**");
       }
       else {
         setData(arg, "PositiveRep", num, message)
-        client.channels.find('name','rep-bot-log').send("** " + message.author + " has set <@"+ arg + ">'s  positive rep to" + num + "**");
         message.reply("set <@" + arg + ">'s postive rep to " + num)
+        client.channels.find('name','admin-logs').send("** " + message.author + " has set <@"+ arg + ">'s  positive rep to" + num + "**");
       }
     }
     else {
@@ -314,10 +408,11 @@ client.on("message", async message => {
     var first = 0
     var second = 0
     var third = 0
+    let ignore = ["228956410572963841","277065146822819851","248539670479241216"]
     for (var i = 0; i < Object.keys(obj).length; i++) {
       currentID = obj[Object.keys(obj)[i]].PersonID
       current = obj[Object.keys(obj)[i]].PositiveRep
-      if (currentID == "228956410572963841" || currentID == "277065146822819851") {
+      if (ignore.includes(currentID))  {
         continue;
       }
       if (current > first) {
@@ -403,7 +498,8 @@ client.on("message", async message => {
   }
 
   if (command === "member") {
-    if (message.member.roles.find("name", "Member")) {
+    let role = message.guild.roles.find("name","Member")
+    if (message.member.roles.has(role.id)) {
       let embed = {
       "description": `${message.author} You already have **Member** role.`,
       "color": 15158332
@@ -423,9 +519,14 @@ client.on("message", async message => {
   }
 
   if (command === "notify") {
-    if (message.member.roles.find("name", "notify")) {
+    let role = message.guild.roles.find("name","notify")
+    message.member.roles.has(role.id)
+    if (message.member.roles.has(role.id)) {
+      let role = message.guild.roles.find("name", "notify");
+      let member = message.member
+      member.removeRole(role).catch(console.error);
       let embed = {
-      "description": `${message.author} You already have **notify** role.`,
+      "description": `${message.author} You no longer have **notify** role.`,
       "color": 15158332
       };
       message.channel.send({ embed });
@@ -443,7 +544,8 @@ client.on("message", async message => {
   }
 
   if (command === "bear") {
-    if (message.member.roles.find("name", "BEAR")) {
+    let role = message.guild.roles.find("name","BEAR")
+    if (message.member.roles.has(role.id)) {
       let role = message.guild.roles.find("name", "BEAR");
       let member = message.member
       member.removeRole(role).catch(console.error);
@@ -466,8 +568,8 @@ client.on("message", async message => {
   }
 
   if (command === "usec") {
-    if (message.member.roles.find("name", "USEC")) {
-      let role = message.guild.roles.find("name", "USEC");
+    let role = message.guild.roles.find("name","USEC")
+    if (message.member.roles.has(role.id)) {
       let member = message.member
       member.removeRole(role).catch(console.error);
       let embed = {
@@ -526,46 +628,54 @@ client.on("message", async message => {
     return message.author.send({ embed })
   }
 
+  if (command === "stoptimed") {
+    if (message.author.id == "237391552698122242" || isStaff(message)) {
+      clearInterval()
+      if (continuedTimed == false) {
+        continueTimed = true;
+        return message.reply("Continuing Timed Roles next time you type t/timedroles")
+      } else {
+        continueTimed = false;
+        return message.reply("Stopping further automated timed roles")
+      }
+    }
+  }
+
   if (command === "timedroles") {
     if (message.author.id == "237391552698122242" || isStaff(message)) {
-      transferring = true;
-      message.channel.send('Bot Commands Temporarily Disabled')
-      let hobo = message.guild.roles.find("name", "Hobo");
-      let newbie = message.guild.roles.find("name", "Newbie");
-      let scav = message.guild.roles.find("name", "Scav");
-      let privat = message.guild.roles.find("name", "Private");
-      let captain = message.guild.roles.find("name", "Captain");
+      if (message.guild.availabe) {
+        console.log('Guild Found')
+      }
+      var hobo = message.guild.roles.find("name", "Hobo");
+      var newbie = message.guild.roles.find("name", "Newbie");
+      var scav = message.guild.roles.find("name", "Scav");
+      var privat = message.guild.roles.find("name", "Private");
+      var captain = message.guild.roles.find("name", "Captain");
       let veteran = message.guild.roles.find("name", "VETERAN");
       if (hobo == undefined || newbie == undefined || scav == undefined || privat == undefined || captain == undefined || veteran == undefined ) {
-        transferring = false;
         return message.reply("This discord server doesn't have the corrent roles to use this command")
       }
+      clearInterval()
+      timedRoles(message)
+      if (continueTimed == true) {
+        setInterval(function() {timedRoles(message)}, 86400000)
+      } else {
+        return
+      }
+    }
+  }
+
+  if (command === 'givenotify') {
+    if (isStaff(message) || message.author.id == "237391552698122242") {
+      let notify = message.guild.roles.find('name', 'notify');
+	  var time = 0;
       message.guild.members.forEach(function(guildMember, guildMemberId) {
-        let timeDay = timeMin() -  Math.floor(guildMember.joinedTimestamp / 60000)
-        timeDay = Math.round(timeDay / 1440)
-        console.log(guildMember.joinedAt)
-        console.log(guildMember.user.username + " " + timeDay)
-        if (timeDay < 7) {
-          guildMember.addRole(hobo)
-        }
-        else if (timeDay >= 7 && timeDay < 30) {
-          guildMember.addRole(newbie)
-        }
-        else if (timeDay >= 30 && timeDay < 60) {
-          guildMember.addRole(scav)
-        }
-        else if (timeDay >= 60 && timeDay < 120) {
-          guildMember.addRole(privat)
-        }
-        else if (timeDay >= 120 && timeDay < 180) {
-          guildMember.addRole(captain)
-        }
-        else if (timeDay >= 180) {
-          guildMember.addRole(veteran)
-        }
+        setTimeout(function(){
+          console.log(guildMember.user.username)
+          guildMember.addRole(notify)
+        }, time)
+        time += 200;
       })
-      transferring = false;
-      return message.channel.send('Bot Commands Re-Enabled')
     }
   }
 
@@ -694,7 +804,7 @@ client.on("message", async message => {
 
   if (command === "help") {
     let embed = {
-      "description": `***Use the prefix ${config.prefix} for all commands*** \n **Reputation Commands**`,
+      "description": `***Use the prefix ${config.prefix} for all commands*** \n **Reputation Commands** ***THIS ALL IS OLD***`,
       "color": 3447003,
       "fields": [
         {
