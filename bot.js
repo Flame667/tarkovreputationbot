@@ -299,21 +299,13 @@ client.on("message", async message => {
       let role = message.guild.roles.find("name", "twitch");
       let member = message.member
       member.removeRole(role).catch(console.error);
-      let embed = {
-        "description": `${message.author} You'll no longer recieve notifications when Ghost goes live on Twitch.`,
-        "color": 15158332
-      };
-      message.channel.send({ embed });
+      message.reply(`${message.author} You\'ll no longer recieve notifications when Ghost goes live on Twitch.`)
     }
     else {
       let role = message.guild.roles.find("name", "twitch");
       let member = message.member
       member.addRole(role).catch(console.error);
-      let embed = {
-        "description": `${message.author} You'll be notified when brodin is live on twitch :BirdPING: \n To remove this role type "t/twitch" in #bot-stuff`,
-        "color": 3066993
-      };
-      message.channel.send({ embed });
+      message.reply(`${message.author} You'll be notified when brodin is live on twitch :BirdPING: \n To remove this role type "t/twitch" in #bot-stuff`)
     }
   }
 
