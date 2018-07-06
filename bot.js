@@ -275,8 +275,8 @@ client.on("message", async message => {
       let member = message.member
       member.removeRole(role).catch(console.error);
       let embed = {
-      "description": `${message.author} You no longer have **notify** role.`,
-      "color": 15158332
+        "description": `${message.author} You no longer have **notify** role.`,
+        "color": 15158332
       };
       message.channel.send({ embed });
     }
@@ -285,59 +285,84 @@ client.on("message", async message => {
       let member = message.member
       member.addRole(role).catch(console.error);
       let embed = {
-      "description": `${message.author} You now have **notify** role.`,
-      "color": 3066993
+        "description": `${message.author} You now have **notify** role.`,
+        "color": 3066993
       };
       message.channel.send({ embed });
     }
   }
 
-  if (command === "bear") {
-    let role = message.guild.roles.find("name","BEAR")
+  if (command === "twitch") {
+    let role = message.guild.roles.find("name","twitch")
+    message.member.roles.has(role.id)
     if (message.member.roles.has(role.id)) {
-      let role = message.guild.roles.find("name", "BEAR");
+      let role = message.guild.roles.find("name", "twitch");
       let member = message.member
       member.removeRole(role).catch(console.error);
       let embed = {
-      "description": `${message.author} You no longer have **BEAR** role.`,
-      "color": 15158332
+        "description": `${message.author} You'll no longer recieve notifications when Ghost goes live on Twitch.`,
+        "color": 15158332
       };
       message.channel.send({ embed });
     }
     else {
-      let role = message.guild.roles.find("name", "BEAR");
+      let role = message.guild.roles.find("name", "twitch");
       let member = message.member
       member.addRole(role).catch(console.error);
       let embed = {
-      "description": `${message.author} You now have **BEAR** role.`,
-      "color": 3066993
+        "description": `${message.author} You'll be notified when brodin is live on twitch :BirdPING: \n To remove this role type "t/twitch" in #bot-stuff`,
+        "color": 3066993
       };
       message.channel.send({ embed });
     }
   }
 
-  if (command === "usec") {
-    let role = message.guild.roles.find("name","USEC")
-    if (message.member.roles.has(role.id)) {
-      let member = message.member
-      member.removeRole(role).catch(console.error);
-      let embed = {
-      "description": `${message.author} You no longer have **USEC** role.`,
-      "color": 15158332
-      };
-      message.channel.send({ embed });
-    }
-    else {
-      let role = message.guild.roles.find("name", "USEC");
-      let member = message.member
-      member.addRole(role).catch(console.error);
-      let embed = {
-      "description": `${message.author} You now have **USEC** role.`,
-      "color": 3066993
-      };
-      message.channel.send({ embed });
-    }
-  }
+  // if (command === "bear") {
+  //   let role = message.guild.roles.find("name","BEAR")
+  //   if (message.member.roles.has(role.id)) {
+  //     let role = message.guild.roles.find("name", "BEAR");
+  //     let member = message.member
+  //     member.removeRole(role).catch(console.error);
+  //     let embed = {
+  //     "description": `${message.author} You no longer have **BEAR** role.`,
+  //     "color": 15158332
+  //     };
+  //     message.channel.send({ embed });
+  //   }
+  //   else {
+  //     let role = message.guild.roles.find("name", "BEAR");
+  //     let member = message.member
+  //     member.addRole(role).catch(console.error);
+  //     let embed = {
+  //     "description": `${message.author} You now have **BEAR** role.`,
+  //     "color": 3066993
+  //     };
+  //     message.channel.send({ embed });
+  //   }
+  // }
+  //
+  // if (command === "usec") {
+  //   let role = message.guild.roles.find("name","USEC")
+  //   if (message.member.roles.has(role.id)) {
+  //     let member = message.member
+  //     member.removeRole(role).catch(console.error);
+  //     let embed = {
+  //     "description": `${message.author} You no longer have **USEC** role.`,
+  //     "color": 15158332
+  //     };
+  //     message.channel.send({ embed });
+  //   }
+  //   else {
+  //     let role = message.guild.roles.find("name", "USEC");
+  //     let member = message.member
+  //     member.addRole(role).catch(console.error);
+  //     let embed = {
+  //     "description": `${message.author} You now have **USEC** role.`,
+  //     "color": 3066993
+  //     };
+  //     message.channel.send({ embed });
+  //   }
+  // }
 
   if (command === "tarkov") {
     let embed = {
@@ -553,32 +578,24 @@ client.on("message", async message => {
 
   if (command === "help") {
     let embed = {
-      "description": `***Use the prefix ${config.prefix} for all commands*** \n **Reputation Commands** ***THIS ALL IS OLD***`,
+      "description": `***Use the prefix ${config.prefix} for all commands***`,
       "color": 3447003,
       "fields": [
         {
-          "name": "+rep or -rep [username]",
-          "value": "Gives or Removes, depending on +/-, another player's reputation"
+          "name": "member",
+          "value": "Gives you the member role"
         },
         {
-          "name": "profile [username](optional)",
-          "value": "Shows your current reputation or someone else's"
+          "name": "notify",
+          "value": "Adds/Removes the notify role, with this role you will recieve our server notifications!"
         },
         {
-          "name": "addshop [url]",
-          "value": " **TRUSTED TRADER ONLY**"
+          "name": "twitch",
+          "value": "Adds/Removes the twitch role, with this role you will be notified when ghost goes online!"
         },
         {
-          "name": "shop [username]",
-          "value": "Show's a Trusted Trader's Shop"
-        },
-        {
-          "name": "leaderboard",
-          "value": "Displays the top 3 users with the highest reputation"
-        },
-        {
-          "name": "Misc Commands",
-          "value": "---------------------"
+          "name": "tarvu",
+          "value": ":octopus:"
         },
         {
           "name": "dice",
@@ -587,62 +604,6 @@ client.on("message", async message => {
         {
           "name": "coinflip",
           "value": "Flips a coin"
-        },
-        {
-          "name": "member",
-          "value": "Gives you the member role"
-        },
-        {
-          "name": "bear",
-          "value": "Gives you the BEAR role"
-        },
-        {
-          "name": "usec",
-          "value": "Gives you the USEC role"
-        },
-        {
-          "name": "notify",
-          "value": "Gives you the notify role"
-        },
-        {
-          "name": "ping",
-          "value": "Pings the bot and returns latency"
-        },
-        {
-          "name": "tarvu",
-          "value": ":octopus:"
-        },
-        {
-          "name": "Raffle Commands",
-          "value": "-----------------------"
-        },
-        {
-          "name": "raffle [max # of participants]",
-          "value": "Starts a raffle that ends when specificed number of people enter"
-        },
-        {
-          "name": "enter",
-          "value": "Enters ongoing raffle"
-        },
-        {
-          "name": "participants",
-          "value": "Lists all participants of current raffle"
-        },
-        {
-          "name": "Admin Commands",
-          "value": "-----------------------"
-        },
-        {
-          "name": "setrep +/- [username] num",
-          "value": "Gives or Removes, depending on +/-, another player's reputation"
-        },
-        {
-          "name": "stopraffle",
-          "value": "Stops current raffle"
-        },
-        {
-          "name": "timedroles",
-          "value": "Gives out Timed Roles"
         }
       ]
     }
