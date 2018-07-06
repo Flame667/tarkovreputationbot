@@ -1,3 +1,4 @@
+"use strict"
 const Discord = require("discord.js")
 const client = new Discord.Client({
   disableEveryone: true,
@@ -17,17 +18,11 @@ var raffleentries = [];
 
 client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`)
-  client.user.setActivity(`on ${client.guilds.size} servers`)
+  client.user.setActivity('t/help for commands')
 });
 
-client.on("guildCreate", guild => {
-  console.log(`New guild joined: ${guild.name} (id: ${guild.id}). This guild has ${guild.memberCount} members!`);
-  client.user.setActivity(`on ${client.guilds.size} servers`);
-});
-
-client.on("guildDelete", guild => {
-  console.log(`I have been removed from: ${guild.name} (id: ${guild.id})`);
-  client.user.setActivity(`on ${client.guilds.size} servers`);
+client.on("error", (e) => {
+  console.log(e)
 });
 
 function timedRoles(message) {
@@ -186,7 +181,7 @@ function Person(personID) {
 }
 
 function CreatePerson(personID){
-   var newUser= new Person(personID);
+   var newUser = new Person(personID);
    return newUser;
 }
 
@@ -196,7 +191,6 @@ client.on("guildMemberAdd", member => {
   member.addRole(role1).catch(console.error);
   // member.addRole(role2).catch(console.error);
   console.log("Someone Joined and was given notify!")
-  // console.log("Someone Joined and was given notify and Hobo!")
 });
 
 client.on("message", async message => {
@@ -205,9 +199,10 @@ client.on("message", async message => {
   }
 
   //if (message.channel.id == '403190416914251777') {
+
   if ((message.content).includes("discord.gg") || (message.content).includes("discordapp.com/invite")) {
     if (!isStaff(message)) {
-      message.author.send("Please do not post invite links to other discords! Thankyou")
+      message.author.send("Please do not post invite links to other discords! Thank you")
       message.delete()
         .then(msg => console.log(`Deleted discord invite link from ${message.author.username}`))
         .catch(console.error);
